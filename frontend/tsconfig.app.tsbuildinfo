@@ -1,0 +1,1 @@
+{"root":["./src/main.tsx","./src/vite-env.d.ts","./src/app/App.tsx","./src/entities/subreddit/types.ts","./src/pages/home/HomePage.tsx","./src/shared/api/subreddit.ts"],"version":"5.9.3"}

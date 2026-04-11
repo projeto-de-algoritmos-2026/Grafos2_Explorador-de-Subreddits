@@ -68,6 +68,10 @@
   padding: 16px 18px;
 }
 
+.searchForm {
+  margin: 0;
+}
+
 .label {
   display: inline-block;
   margin-bottom: 8px;
@@ -115,10 +119,19 @@
   background: #f15a24;
 }
 
+.button:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
 .helper {
   margin: 10px 0 0;
   color: #6b7f92;
   font-size: 12px;
+}
+
+.helper code {
+  font-size: 11px;
 }
 
 .resultsHeader {
@@ -142,27 +155,39 @@
   font-size: 12px;
 }
 
-.resultList {
+.resultsBody {
+  padding: 16px;
+}
+
+.statusMessage,
+.errorMessage {
   margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.resultCard {
-  border-top: 1px solid #d8e1ea;
   padding: 14px 16px;
+  border: 1px solid #d3dde7;
+  background: #f7fafc;
+  color: #55697c;
+  font-size: 14px;
 }
 
-.resultCard:first-child {
-  border-top: 0;
+.errorMessage {
+  border-color: #e4b0a0;
+  background: #fff4f0;
+  color: #9a3d1b;
 }
 
-.resultTop {
+.summaryBlock {
+  margin-bottom: 16px;
+  border: 1px solid #d3dde7;
+  background: #f9fbfd;
+  padding: 16px;
+}
+
+.summaryTitleRow {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .resultName {
@@ -184,13 +209,141 @@
   font-size: 14px;
 }
 
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metricCard,
+.sentimentPanel,
+.sourcesSection {
+  border: 1px solid #d3dde7;
+  background: #ffffff;
+}
+
+.metricCard {
+  padding: 14px;
+}
+
+.metricLabel {
+  display: block;
+  margin-bottom: 8px;
+  color: #6b7f92;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metricValue {
+  color: #294e6e;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.sentimentPanel,
+.sourcesSection {
+  margin-bottom: 16px;
+  padding: 16px;
+}
+
+.sentimentHeader,
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: #2f5676;
+  font-size: 18px;
+}
+
+.sentimentMeta,
+.sectionMeta {
+  color: #6b7f92;
+  font-size: 12px;
+}
+
+.sentimentBar {
+  display: flex;
+  overflow: hidden;
+  height: 18px;
+  border: 1px solid #cbd8e4;
+  background: #edf3f8;
+}
+
+.sentimentPositive {
+  min-width: 0;
+  background: linear-gradient(90deg, #5aa05a 0%, #82be6f 100%);
+}
+
+.sentimentNegative {
+  min-width: 0;
+  background: linear-gradient(90deg, #d86a45 0%, #f08a5d 100%);
+}
+
+.sourceList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sourceItem {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  border-top: 1px solid #d8e1ea;
+  padding: 12px 0;
+}
+
+.sourceItem:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.sourceRank {
+  color: #a2401d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sourceName {
+  min-width: 0;
+  color: #2c5d88;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.sourceValue {
+  white-space: nowrap;
+  color: #55697c;
+  font-size: 13px;
+}
+
 @media (max-width: 720px) {
   .headerInner,
   .resultsHeader,
-  .resultTop,
+  .summaryTitleRow,
+  .sentimentHeader,
+  .sectionHeader,
   .searchRow {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .metricGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sourceItem {
+    grid-template-columns: 1fr;
+    gap: 6px;
   }
 
   .button {
