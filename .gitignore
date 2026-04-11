@@ -1,0 +1,24 @@
+# Ambiente virtual
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Dataset
+backend/data/*
+!backend/data/.gitkeep
+
+# VS Code / IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# 🧾 Sistema operacional
+.DS_Store
+Thumbs.db
