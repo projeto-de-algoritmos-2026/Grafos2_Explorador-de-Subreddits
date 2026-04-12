@@ -21,8 +21,8 @@ No backend, cada aresta representa uma referência de um subreddit de origem par
 O frontend consome esses dados e exibe uma interface de busca para visualizar o resumo da análise e o mapa de influência retornado pelo backend.
 
 ## Screenshots
-![Tela de pesquisa](docs/screenshots/pesquisa.png)
 ![Tela de chegada](docs/screenshots/chegada.png)
+![Tela de pesquisa](docs/screenshots/pesquisa.png)
 ![Mapa de influencia](docs/screenshots/mapa_influencia.png)
 
 ## Instalação
