@@ -1,17 +1,41 @@
 # G2_Grafos_PA-26.1
 
-## Requisitos e Execução do Backend
+Conteúdo da Disciplina: Grafos
 
-### Requisitos
+## Alunos
+| Matrícula | Aluno |
+| -- | -- |
+| 231035446 | Lucas Monteir Freitas |
+| 231011533 | João Maurício Pilla Nascimento |
 
-Antes de executar o projeto, certifique-se de ter instalado:
+## Sobre
+Este projeto analisa relações entre subreddits a partir de um grafo direcionado construído com o dataset `soc-redditHyperlinks`.
 
-* Python **3.8 ou superior**
-* Conexão com a internet (para download automático do dataset)
+No backend, cada aresta representa uma referência de um subreddit de origem para um subreddit de destino, com informações de sentimento e timestamp. A aplicação permite:
 
----
+- consultar métricas agregadas de um subreddit;
+- contar menções positivas e negativas;
+- listar as principais comunidades que apontam para o subreddit buscado;
+- executar uma BFS reversa para identificar quem cita ou influencia um subreddit até uma profundidade informada.
 
-### Executando o backend
+O frontend consome esses dados e exibe uma interface de busca para visualizar o resumo da análise e o mapa de influência retornado pelo backend.
+
+## Screenshots
+![Tela de pesquisa](docs/screenshots/pesquisa.png)
+![Tela de chegada](docs/screenshots/chegada.png)
+![Mapa de influencia](docs/screenshots/mapa_influencia.png)
+
+## Instalação
+Linguagem: Python e TypeScript
+Framework: FastAPI e React + Vite
+
+### Pré-requisitos
+
+- Python 3.8 ou superior
+- Node.js 20 ou superior
+- npm 10 ou superior
+
+### Backend
 
 Na raiz do projeto, execute:
 
@@ -19,49 +43,46 @@ Na raiz do projeto, execute:
 python setup.py
 ```
 
-Este comando irá automaticamente:
+Esse comando:
 
-* Baixar o dataset necessário
-* Criar um ambiente virtual (`venv`)
-* Instalar todas as dependências do projeto
-* Iniciar o servidor backend
+- cria o ambiente virtual `venv`;
+- instala as dependências do backend listadas em `requirements.txt`;
+- baixa os arquivos do dataset para `backend/data/`;
+- inicia a API FastAPI em `http://127.0.0.1:8000`.
 
----
+### Frontend
 
-### Acessando a API
+Em outro terminal, execute:
 
-Após a execução, o backend estará disponível em:
-
+```bash
+cd frontend
+npm install
+npm run dev
 ```
-http://127.0.0.1:8000
-```
 
-Interface interativa (Swagger):
+O frontend ficará disponível no endereço informado pelo Vite, normalmente `http://127.0.0.1:5173`.
 
-```
+## Uso
+1. Inicie o backend com `python setup.py`.
+2. Inicie o frontend com `npm run dev` dentro da pasta `frontend`.
+3. Acesse a interface no navegador.
+4. Digite o nome de um subreddit, como `python`.
+5. Consulte o resumo da análise, incluindo total de menções, sentimento e top fontes.
+6. Ajuste a profundidade da BFS para visualizar o mapa de influência do subreddit pesquisado.
+
+Também é possível testar diretamente a API pelos endpoints:
+
+- `GET /subreddit/{name}`
+- `GET /influence/{name}?depth=2`
+
+A documentação interativa do backend fica em:
+
+```text
 http://127.0.0.1:8000/docs
 ```
 
----
+## Outros
 
-### Testando um endpoint
-
-Exemplo de requisição:
-
-```
-GET /subreddit/{name}
-```
-
-Exemplo prático:
-
-```
-http://127.0.0.1:8000/subreddit/python
-```
-
----
-
-### Observações
-
-* Na primeira execução, o processo pode demorar alguns minutos devido ao download do dataset e instalação das dependências.
-* Execuções posteriores serão mais rápidas, pois o ambiente e os dados já estarão configurados.
-* Caso o dataset já exista na pasta `backend/data/`, o download será automaticamente ignorado.
+- Na primeira execução, o processo pode demorar alguns minutos por causa da instalação das dependências e do download do dataset.
+- Se os arquivos já existirem em `backend/data/`, o download é ignorado.
+- O projeto usa um grafo direcionado para representar citações entre subreddits e uma BFS reversa para explorar predecessores de um subreddit alvo.
