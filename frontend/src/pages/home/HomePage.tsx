@@ -1,8 +1,14 @@
 import { useState } from "react";
 
-import type { SubredditAnalysis } from "@/entities/subreddit/types";
+import type {
+  SubredditAnalysis,
+  SubredditInfluence,
+} from "@/entities/subreddit/types";
 import styles from "@/pages/home/HomePage.module.css";
-import { fetchSubredditAnalysis } from "@/shared/api/subreddit";
+import {
+  fetchSubredditAnalysis,
+  fetchSubredditInfluence,
+} from "@/shared/api/subreddit";
 
 const numberFormatter = new Intl.NumberFormat("pt-BR");
 const percentFormatter = new Intl.NumberFormat("pt-BR", {
@@ -12,27 +18,64 @@ const percentFormatter = new Intl.NumberFormat("pt-BR", {
 
 export function HomePage() {
   const [subredditName, setSubredditName] = useState("");
+  const [influenceDepth, setInfluenceDepth] = useState("2");
   const [analysis, setAnalysis] = useState<SubredditAnalysis | null>(null);
+  const [influence, setInfluence] = useState<SubredditInfluence | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [influenceErrorMessage, setInfluenceErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const normalizedName = subredditName.trim();
+    const normalizedDepth = Number.parseInt(influenceDepth, 10);
 
     if (!normalizedName) {
       setAnalysis(null);
+      setInfluence(null);
       setErrorMessage("Informe um subreddit para pesquisar.");
+      setInfluenceErrorMessage("");
+      return;
+    }
+
+    if (!Number.isFinite(normalizedDepth) || normalizedDepth < 1) {
+      setInfluence(null);
+      setInfluenceErrorMessage("Informe uma profundidade valida a partir de 1.");
       return;
     }
 
     setIsLoading(true);
     setErrorMessage("");
+    setInfluenceErrorMessage("");
 
     try {
-      const nextAnalysis = await fetchSubredditAnalysis(normalizedName);
-      setAnalysis(nextAnalysis);
+      const [analysisResult, influenceResult] = await Promise.allSettled([
+        fetchSubredditAnalysis(normalizedName),
+        fetchSubredditInfluence(normalizedName, normalizedDepth),
+      ]);
+
+      if (analysisResult.status === "fulfilled") {
+        setAnalysis(analysisResult.value);
+      } else {
+        setAnalysis(null);
+        setErrorMessage(
+          analysisResult.reason instanceof Error
+            ? analysisResult.reason.message
+            : "Nao foi possivel consultar o backend.",
+        );
+      }
+
+      if (influenceResult.status === "fulfilled") {
+        setInfluence(influenceResult.value);
+      } else {
+        setInfluence(null);
+        setInfluenceErrorMessage(
+          influenceResult.reason instanceof Error
+            ? influenceResult.reason.message
+            : "Nao foi possivel consultar a influencia.",
+        );
+      }
     } catch (error) {
       const message =
         error instanceof Error
@@ -40,13 +83,16 @@ export function HomePage() {
           : "Nao foi possivel consultar o backend.";
 
       setAnalysis(null);
+      setInfluence(null);
       setErrorMessage(message);
+      setInfluenceErrorMessage("");
     } finally {
       setIsLoading(false);
     }
   };
 
   const hasAnalysis = analysis !== null;
+  const hasInfluence = influence !== null;
   const positivityPercent = hasAnalysis
     ? percentFormatter.format(analysis.positivityRatio * 100)
     : "0,0";
@@ -95,6 +141,24 @@ export function HomePage() {
                 placeholder="Ex.: python"
                 autoComplete="off"
               />
+              <div className={styles.depthField}>
+                <label
+                  className={styles.depthLabel}
+                  htmlFor="influence-depth"
+                >
+                  Profundidade BFS
+                </label>
+                <input
+                  className={styles.depthInput}
+                  id="influence-depth"
+                  name="influence-depth"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={influenceDepth}
+                  onChange={(event) => setInfluenceDepth(event.target.value)}
+                />
+              </div>
               <button
                 className={styles.button}
                 type="submit"
@@ -242,6 +306,54 @@ export function HomePage() {
                       subreddit.
                     </p>
                   )}
+                </div>
+
+                <div className={styles.influenceSection}>
+                  <div className={styles.sectionHeader}>
+                    <h3 className={styles.sectionTitle}>Mapa de influencia</h3>
+                    <span className={styles.sectionMeta}>
+                      {hasInfluence
+                        ? `${numberFormatter.format(influence.nodesFound)} comunidades em ate ${influence.maxDepth} niveis`
+                        : `Busca BFS configurada com profundidade ${influenceDepth}`}
+                    </span>
+                  </div>
+
+                  <p className={styles.resultDescription}>
+                    A BFS percorre os predecessores do subreddit alvo para
+                    mostrar quem aponta para ele e em qual nivel da cadeia cada
+                    comunidade aparece.
+                  </p>
+
+                  {isLoading ? null : influenceErrorMessage ? (
+                    <p className={styles.errorMessage} aria-live="polite">
+                      {influenceErrorMessage}
+                    </p>
+                  ) : null}
+
+                  {!isLoading && !influenceErrorMessage && hasInfluence ? (
+                    influence.influence.length > 0 ? (
+                      <ul className={styles.influenceList}>
+                        {influence.influence.map((node, index) => (
+                          <li
+                            className={styles.influenceItem}
+                            key={`${node.name}-${node.depth}-${index}`}
+                          >
+                            <span className={styles.influenceNode}>
+                              r/{node.name}
+                            </span>
+                            <span className={styles.influenceDepth}>
+                              nivel {node.depth}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className={styles.statusMessage}>
+                        Nenhuma comunidade predecessora foi encontrada para esse
+                        subreddit na profundidade informada.
+                      </p>
+                    )
+                  ) : null}
                 </div>
               </>
             ) : null}

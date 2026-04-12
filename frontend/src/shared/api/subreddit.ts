@@ -1,4 +1,7 @@
-import type { SubredditAnalysis } from "@/entities/subreddit/types";
+import type {
+  SubredditAnalysis,
+  SubredditInfluence,
+} from "@/entities/subreddit/types";
 
 type BackendSubredditAnalysis = {
   subreddit: string;
@@ -9,6 +12,16 @@ type BackendSubredditAnalysis = {
   top_sources: [string, number][];
 };
 
+type BackendSubredditInfluence = {
+  target: string;
+  max_depth: number;
+  nodes_found: number;
+  influence: Array<{
+    subreddit: string;
+    depth: number;
+  }>;
+};
+
 type BackendErrorResponse = {
   error: string;
 };
@@ -16,26 +29,21 @@ type BackendErrorResponse = {
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
 function isBackendErrorResponse(
-  payload: BackendSubredditAnalysis | BackendErrorResponse,
+  payload:
+    | BackendSubredditAnalysis
+    | BackendSubredditInfluence
+    | BackendErrorResponse,
 ): payload is BackendErrorResponse {
   return "error" in payload;
 }
 
-export async function fetchSubredditAnalysis(
-  subredditName: string,
-): Promise<SubredditAnalysis> {
-  const normalizedName = subredditName.trim();
-
-  if (!normalizedName) {
-    throw new Error("Informe um subreddit para pesquisar.");
-  }
-
+async function fetchBackendPayload<
+  TPayload extends BackendSubredditAnalysis | BackendSubredditInfluence,
+>(path: string): Promise<TPayload> {
   let response: Response;
 
   try {
-    response = await fetch(
-      `${API_BASE_URL}/subreddit/${encodeURIComponent(normalizedName)}`,
-    );
+    response = await fetch(`${API_BASE_URL}${path}`);
   } catch {
     throw new Error(
       "Nao foi possivel conectar ao backend em http://127.0.0.1:8000.",
@@ -43,13 +51,11 @@ export async function fetchSubredditAnalysis(
   }
 
   const rawBody = await response.text();
-  let payload: BackendSubredditAnalysis | BackendErrorResponse | null = null;
+  let payload: TPayload | BackendErrorResponse | null = null;
 
   if (rawBody) {
     try {
-      payload = JSON.parse(rawBody) as
-        | BackendSubredditAnalysis
-        | BackendErrorResponse;
+      payload = JSON.parse(rawBody) as TPayload | BackendErrorResponse;
     } catch {
       if (!response.ok) {
         throw new Error("O backend retornou uma resposta invalida.");
@@ -75,6 +81,22 @@ export async function fetchSubredditAnalysis(
     throw new Error(payload.error);
   }
 
+  return payload;
+}
+
+export async function fetchSubredditAnalysis(
+  subredditName: string,
+): Promise<SubredditAnalysis> {
+  const normalizedName = subredditName.trim();
+
+  if (!normalizedName) {
+    throw new Error("Informe um subreddit para pesquisar.");
+  }
+
+  const payload = await fetchBackendPayload<BackendSubredditAnalysis>(
+    `/subreddit/${encodeURIComponent(normalizedName)}`,
+  );
+
   return {
     subreddit: payload.subreddit,
     totalMentions: payload.total_mentions,
@@ -84,6 +106,35 @@ export async function fetchSubredditAnalysis(
     topSources: payload.top_sources.map(([name, mentions]) => ({
       name,
       mentions,
+    })),
+  };
+}
+
+export async function fetchSubredditInfluence(
+  subredditName: string,
+  depth: number,
+): Promise<SubredditInfluence> {
+  const normalizedName = subredditName.trim();
+
+  if (!normalizedName) {
+    throw new Error("Informe um subreddit para pesquisar.");
+  }
+
+  const normalizedDepth = Number.isFinite(depth)
+    ? Math.max(1, Math.floor(depth))
+    : 1;
+
+  const payload = await fetchBackendPayload<BackendSubredditInfluence>(
+    `/influence/${encodeURIComponent(normalizedName)}?depth=${normalizedDepth}`,
+  );
+
+  return {
+    target: payload.target,
+    maxDepth: payload.max_depth,
+    nodesFound: payload.nodes_found,
+    influence: payload.influence.map((node) => ({
+      name: node.subreddit,
+      depth: node.depth,
     })),
   };
 }

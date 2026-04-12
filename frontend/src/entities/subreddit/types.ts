@@ -3,6 +3,11 @@ export type TopSource = {
   mentions: number;
 };
 
+export type InfluenceNode = {
+  name: string;
+  depth: number;
+};
+
 export type SubredditAnalysis = {
   subreddit: string;
   totalMentions: number;
@@ -10,4 +15,11 @@ export type SubredditAnalysis = {
   negative: number;
   positivityRatio: number;
   topSources: TopSource[];
+};
+
+export type SubredditInfluence = {
+  target: string;
+  maxDepth: number;
+  nodesFound: number;
+  influence: InfluenceNode[];
 };

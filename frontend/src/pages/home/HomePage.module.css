@@ -83,7 +83,20 @@
 .searchRow {
   display: flex;
   gap: 10px;
-  align-items: center;
+  align-items: flex-end;
+}
+
+.depthField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 160px;
+}
+
+.depthLabel {
+  color: #35516b;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .input {
@@ -101,6 +114,19 @@
 }
 
 .input:focus {
+  outline: 1px dotted #335f8d;
+  outline-offset: 1px;
+}
+
+.depthInput {
+  height: 40px;
+  border: 1px solid #8ea7bf;
+  background: #fbfdff;
+  padding: 0 12px;
+  color: #1f2c38;
+}
+
+.depthInput:focus {
   outline: 1px dotted #335f8d;
   outline-offset: 1px;
 }
@@ -218,7 +244,8 @@
 
 .metricCard,
 .sentimentPanel,
-.sourcesSection {
+.sourcesSection,
+.influenceSection {
   border: 1px solid #d3dde7;
   background: #ffffff;
 }
@@ -243,7 +270,8 @@
 }
 
 .sentimentPanel,
-.sourcesSection {
+.sourcesSection,
+.influenceSection {
   margin-bottom: 16px;
   padding: 16px;
 }
@@ -326,6 +354,36 @@
   font-size: 13px;
 }
 
+.influenceList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.influenceItem {
+  border: 1px solid #d8e1ea;
+  background: #f7fafc;
+  padding: 12px;
+}
+
+.influenceNode {
+  display: block;
+  margin-bottom: 6px;
+  color: #2c5d88;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.influenceDepth {
+  color: #55697c;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 @media (max-width: 720px) {
   .headerInner,
   .resultsHeader,
@@ -348,5 +406,9 @@
 
   .button {
     width: 100%;
+  }
+
+  .depthField {
+    flex: 1 1 auto;
   }
 }
