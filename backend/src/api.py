@@ -17,7 +17,7 @@ def root():
 def get_subreddit(name: str):
     return analyze_subreddit(G, name)
 
-@app.get("/influence-sentiment/{name}")
+@app.get("/influence/{name}")
 def get_influence_sentiment(name: str, depth: int = 1):
     return bfs_influence_with_sentiment(G, name, depth)
 
