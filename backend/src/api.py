@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from src.graph import build_graph
-from src.service import analyze_subreddit, bfs_influence
+from src.service import analyze_subreddit, bfs_influence_with_sentiment, visualize_bfs
 
 app = FastAPI()
 
@@ -17,6 +17,14 @@ def root():
 def get_subreddit(name: str):
     return analyze_subreddit(G, name)
 
-@app.get("/influence/{name}")
-def get_influence(name: str, depth: int = 1):
-    return bfs_influence(G, name, depth)
+@app.get("/influence-sentiment/{name}")
+def get_influence_sentiment(name: str, depth: int = 1):
+    return bfs_influence_with_sentiment(G, name, depth)
+
+@app.get("/visualize/{name}")
+def visualize(name: str):
+    path = visualize_bfs(G, name)
+    return {
+        "message": "Visualização gerada com sucesso",
+        "file": path
+    }

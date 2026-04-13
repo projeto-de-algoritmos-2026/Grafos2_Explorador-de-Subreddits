@@ -19,6 +19,6 @@ backend/data/*
 # Logs
 *.log
 
-# 🧾 Sistema operacional
+# Sistema operacional
 .DS_Store
 Thumbs.db
