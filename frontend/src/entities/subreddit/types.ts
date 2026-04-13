@@ -3,9 +3,11 @@ export type TopSource = {
   mentions: number;
 };
 
-export type InfluenceNode = {
-  name: string;
+export type InfluenceEdge = {
+  source: string;
+  target: string;
   depth: number;
+  sentiment: "positive" | "negative" | "neutral";
 };
 
 export type SubredditAnalysis = {
@@ -20,6 +22,9 @@ export type SubredditAnalysis = {
 export type SubredditInfluence = {
   target: string;
   maxDepth: number;
-  nodesFound: number;
-  influence: InfluenceNode[];
+  edgesFound: number;
+  positive: number;
+  negative: number;
+  negativityRatio: number;
+  influence: InfluenceEdge[];
 };

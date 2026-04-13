@@ -41,7 +41,9 @@ export function HomePage() {
 
     if (!Number.isFinite(normalizedDepth) || normalizedDepth < 1) {
       setInfluence(null);
-      setInfluenceErrorMessage("Informe uma profundidade valida a partir de 1.");
+      setInfluenceErrorMessage(
+        "Informe uma profundidade valida a partir de 1.",
+      );
       return;
     }
 
@@ -103,6 +105,9 @@ export function HomePage() {
           : (analysis.negative / analysis.totalMentions) * 100,
       )
     : "0,0";
+  const influenceNegativityPercent = hasInfluence
+    ? percentFormatter.format(influence.negativityRatio * 100)
+    : "0,0";
 
   return (
     <main className={styles.page}>
@@ -124,7 +129,10 @@ export function HomePage() {
           </p>
         </div>
 
-        <section className={styles.searchPanel} aria-label="Formulario de pesquisa">
+        <section
+          className={styles.searchPanel}
+          aria-label="Formulario de pesquisa"
+        >
           <label className={styles.label} htmlFor="subreddit-name">
             Nome do subreddit
           </label>
@@ -142,10 +150,7 @@ export function HomePage() {
                 autoComplete="off"
               />
               <div className={styles.depthField}>
-                <label
-                  className={styles.depthLabel}
-                  htmlFor="influence-depth"
-                >
+                <label className={styles.depthLabel} htmlFor="influence-depth">
                   Profundidade BFS
                 </label>
                 <input
@@ -170,12 +175,15 @@ export function HomePage() {
           </form>
 
           <p className={styles.helper}>
-            O frontend chama o endpoint <code>/subreddit/{`{name}`}</code> via
-            proxy local do Vite.
+            O frontend consulta <code>/subreddit/{`{name}`}</code> e{" "}
+            <code>/influence/{`{name}`}</code> via proxy local do Vite.
           </p>
         </section>
 
-        <section className={styles.resultsPanel} aria-label="Resultados da pesquisa">
+        <section
+          className={styles.resultsPanel}
+          aria-label="Resultados da pesquisa"
+        >
           <div className={styles.resultsHeader}>
             <h2 className={styles.resultsTitle}>Resumo da analise</h2>
             <span className={styles.resultsMeta}>
@@ -208,7 +216,9 @@ export function HomePage() {
               <>
                 <div className={styles.summaryBlock}>
                   <div className={styles.summaryTitleRow}>
-                    <h3 className={styles.resultName}>r/{analysis.subreddit}</h3>
+                    <h3 className={styles.resultName}>
+                      r/{analysis.subreddit}
+                    </h3>
                     <span className={styles.resultBadge}>
                       {numberFormatter.format(analysis.totalMentions)} mencoes
                     </span>
@@ -253,7 +263,9 @@ export function HomePage() {
 
                 <div className={styles.sentimentPanel}>
                   <div className={styles.sentimentHeader}>
-                    <h3 className={styles.sectionTitle}>Leitura de sentimento</h3>
+                    <h3 className={styles.sectionTitle}>
+                      Leitura de sentimento
+                    </h3>
                     <span className={styles.sentimentMeta}>
                       {positivityPercent}% positivo / {negativityPercent}%
                       negativo
@@ -290,7 +302,9 @@ export function HomePage() {
                     <ul className={styles.sourceList}>
                       {analysis.topSources.map((source, index) => (
                         <li className={styles.sourceItem} key={source.name}>
-                          <span className={styles.sourceRank}>#{index + 1}</span>
+                          <span className={styles.sourceRank}>
+                            #{index + 1}
+                          </span>
                           <span className={styles.sourceName}>
                             r/{source.name}
                           </span>
@@ -313,15 +327,15 @@ export function HomePage() {
                     <h3 className={styles.sectionTitle}>Mapa de influencia</h3>
                     <span className={styles.sectionMeta}>
                       {hasInfluence
-                        ? `${numberFormatter.format(influence.nodesFound)} comunidades em ate ${influence.maxDepth} niveis`
+                        ? `${numberFormatter.format(influence.edgesFound)} arestas em ate ${influence.maxDepth} niveis`
                         : `Busca BFS configurada com profundidade ${influenceDepth}`}
                     </span>
                   </div>
 
                   <p className={styles.resultDescription}>
                     A BFS percorre os predecessores do subreddit alvo para
-                    mostrar quem aponta para ele e em qual nivel da cadeia cada
-                    comunidade aparece.
+                    mostrar cada conexao encontrada, o nivel da cadeia e o
+                    sentimento associado a cada aresta.
                   </p>
 
                   {isLoading ? null : influenceErrorMessage ? (
@@ -331,28 +345,85 @@ export function HomePage() {
                   ) : null}
 
                   {!isLoading && !influenceErrorMessage && hasInfluence ? (
-                    influence.influence.length > 0 ? (
-                      <ul className={styles.influenceList}>
-                        {influence.influence.map((node, index) => (
-                          <li
-                            className={styles.influenceItem}
-                            key={`${node.name}-${node.depth}-${index}`}
-                          >
-                            <span className={styles.influenceNode}>
-                              r/{node.name}
-                            </span>
-                            <span className={styles.influenceDepth}>
-                              nivel {node.depth}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className={styles.statusMessage}>
-                        Nenhuma comunidade predecessora foi encontrada para esse
-                        subreddit na profundidade informada.
-                      </p>
-                    )
+                    <>
+                      <div className={styles.metricGrid}>
+                        <article className={styles.metricCard}>
+                          <span className={styles.metricLabel}>
+                            Arestas encontradas
+                          </span>
+                          <strong className={styles.metricValue}>
+                            {numberFormatter.format(influence.edgesFound)}
+                          </strong>
+                        </article>
+
+                        <article className={styles.metricCard}>
+                          <span className={styles.metricLabel}>
+                            Positivas na BFS
+                          </span>
+                          <strong className={styles.metricValue}>
+                            {numberFormatter.format(influence.positive)}
+                          </strong>
+                        </article>
+
+                        <article className={styles.metricCard}>
+                          <span className={styles.metricLabel}>
+                            Negativas na BFS
+                          </span>
+                          <strong className={styles.metricValue}>
+                            {numberFormatter.format(influence.negative)}
+                          </strong>
+                        </article>
+
+                        <article className={styles.metricCard}>
+                          <span className={styles.metricLabel}>
+                            Taxa negativa
+                          </span>
+                          <strong className={styles.metricValue}>
+                            {influenceNegativityPercent}%
+                          </strong>
+                        </article>
+                      </div>
+
+                      {influence.influence.length > 0 ? (
+                        <ul className={styles.influenceList}>
+                          {influence.influence.map((edge, index) => (
+                            <li
+                              className={styles.influenceItem}
+                              key={`${edge.source}-${edge.target}-${edge.depth}-${index}`}
+                            >
+                              <span className={styles.influenceNode}>
+                                r/{edge.source} -&gt; r/{edge.target}
+                              </span>
+                              <div className={styles.influenceMetaRow}>
+                                <span className={styles.influenceDepth}>
+                                  nivel {edge.depth}
+                                </span>
+                                <span
+                                  className={`${styles.influenceSentiment} ${
+                                    edge.sentiment === "positive"
+                                      ? styles.influenceSentimentPositive
+                                      : edge.sentiment === "negative"
+                                        ? styles.influenceSentimentNegative
+                                        : styles.influenceSentimentNeutral
+                                  }`}
+                                >
+                                  {edge.sentiment === "positive"
+                                    ? "positivo"
+                                    : edge.sentiment === "negative"
+                                      ? "negativo"
+                                      : "neutro"}
+                                </span>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className={styles.statusMessage}>
+                          Nenhuma aresta predecessora foi encontrada para esse
+                          subreddit na profundidade informada.
+                        </p>
+                      )}
+                    </>
                   ) : null}
                 </div>
               </>

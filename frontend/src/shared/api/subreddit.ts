@@ -9,16 +9,21 @@ type BackendSubredditAnalysis = {
   positive: number;
   negative: number;
   positivity_ratio: number;
-  top_sources: [string, number][];
+  top_sources?: [string, number][];
 };
 
 type BackendSubredditInfluence = {
   target: string;
   max_depth: number;
-  nodes_found: number;
-  influence: Array<{
-    subreddit: string;
+  edges_found: number;
+  positive: number;
+  negative: number;
+  negativity_ratio: number;
+  edges?: Array<{
+    source: string;
+    target: string;
     depth: number;
+    sentiment: "positive" | "negative" | "neutral";
   }>;
 };
 
@@ -103,7 +108,10 @@ export async function fetchSubredditAnalysis(
     positive: payload.positive,
     negative: payload.negative,
     positivityRatio: payload.positivity_ratio,
-    topSources: payload.top_sources.map(([name, mentions]) => ({
+    topSources: (Array.isArray(payload.top_sources)
+      ? payload.top_sources
+      : []
+    ).map(([name, mentions]) => ({
       name,
       mentions,
     })),
@@ -131,10 +139,17 @@ export async function fetchSubredditInfluence(
   return {
     target: payload.target,
     maxDepth: payload.max_depth,
-    nodesFound: payload.nodes_found,
-    influence: payload.influence.map((node) => ({
-      name: node.subreddit,
-      depth: node.depth,
-    })),
+    edgesFound: payload.edges_found,
+    positive: payload.positive,
+    negative: payload.negative,
+    negativityRatio: payload.negativity_ratio,
+    influence: (Array.isArray(payload.edges) ? payload.edges : []).map(
+      (edge) => ({
+        source: edge.source,
+        target: edge.target,
+        sentiment: edge.sentiment,
+        depth: edge.depth,
+      }),
+    ),
   };
 }

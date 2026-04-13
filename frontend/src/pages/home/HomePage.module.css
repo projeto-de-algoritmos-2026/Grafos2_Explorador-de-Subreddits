@@ -377,11 +377,45 @@
   font-weight: 700;
 }
 
+.influenceMetaRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
 .influenceDepth {
   color: #55697c;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.influenceSentiment {
+  border: 1px solid #d8e1ea;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.influenceSentimentPositive {
+  border-color: #91bb87;
+  background: #edf8ea;
+  color: #3f7740;
+}
+
+.influenceSentimentNegative {
+  border-color: #e0a08a;
+  background: #fff0ea;
+  color: #a34b28;
+}
+
+.influenceSentimentNeutral {
+  border-color: #c7d3df;
+  background: #f3f7fa;
+  color: #607284;
 }
 
 @media (max-width: 720px) {
