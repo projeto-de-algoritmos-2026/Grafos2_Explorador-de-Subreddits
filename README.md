@@ -87,5 +87,5 @@ http://127.0.0.1:8000/docs
 - Se os arquivos já existirem em `backend/data/`, o download é ignorado.
 - O projeto usa um grafo direcionado para representar citações entre subreddits e uma BFS reversa para explorar predecessores de um subreddit alvo.
 
-## Video
+## Vídeo
 - https://youtu.be/Yb56BMqA_SU
